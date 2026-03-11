@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基岩版 · 泥土金币商店 </title>
+    <style>
+        body {
+            background: #0b0e14;
+            color: #eef2f5;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .post-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(20, 30, 40, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 20px 40px -10px black;
+            border: 1px solid rgba(255, 215, 140, 0.2);
+        }
+        .back-home {
+            display: inline-block;
+            margin-bottom: 25px;
+            color: #ffbc5c;
+            text-decoration: none;
+            border-bottom: 2px dotted;
+        }
+        h1 {
+            color: #ffda88;
+            font-size: 2.2rem;
+            margin-top: 0;
+        }
+        h2 {
+            color: #ffcd81;
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            border-left: 6px solid #fbaa4b;
+            padding-left: 18px;
+        }
+        h3 {
+            color: #ffe3a8;
+            font-size: 1.3rem;
+            margin: 30px 0 15px;
+        }
+        .cmd-block {
+            background: #1b2a33;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-family: 'Courier New', monospace;
+            color: #ffbc5c;
+            border: 1px solid #ffbf6b60;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: #1d2a33;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        th {
+            background: #2d3f4e;
+            color: #ffda88;
+            font-weight: 600;
+            padding: 12px 10px;
+        }
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #3d4f5e;
+            font-family: 'Courier New', monospace;
+            color: #ccdbea;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .note {
+            background: #263b47;
+            padding: 15px 20px;
+            border-radius: 20px;
+            color: #ccdbea;
+            margin: 25px 0;
+            border-left: 6px solid #ffb444;
+        }
+        hr {
+            border: 1px solid #ffc06130;
+            margin: 40px 0;
+        }
+        .date {
+            color: #9bb5ce;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            border-left: 4px solid #ffb444;
+            padding-left: 15px;
+        }
+        .image-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 40px 0 20px;
+        }
+        .image-row img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 16px;
+            border: 2px solid #ffbf6b60;
+            box-shadow: 0 10px 20px -5px black;
+        }
+    </style>
+</head>
+<body>
+<div class="post-container">
+    <a href="../index.html" class="back-home">← 返回首页</a>
+    <h1>🧱 基岩版 · 泥土金币商店 · </h1>
+    <div class="date">📅 2026-03-10 | 适用版本：1.20+ 基岩版/网易版</div>
+
+    <p>本教程使用 <strong>泥土</strong> 作为基础货币，通过计分板实现金币系统。包含：创建计分板、消除下线玩家、购买商店（structure加载物品）、显示个人金币。</p>
+
+    <h2>一、金币计分板指令</h2>
+
+    <h3>1. 创建计分板（聊天框执行一次）</h3>
+    <div class="cmd-block">/scoreboard objectives add 金币 dummy 金币<br>/scoreboard objectives add 备份金币 dummy 金币</div>
+
+    <h3>2. 玩家下线处理(如果你是使用打是侧边显示计分板 那么你需要这个前置 此处不再配备显示计分板教程)</h3>
+    <p>放置四个命令方块，箭头方向一致，参数如下：</p>
+    <table>
+        <thead>
+            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>循环</td><td>无条件</td><td>保持开启</td><td>scoreboard objectives remove 备份金币</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard objectives add 备份金币 dummy 金币</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>/scoreboard objectives setdisplay list 备份金币 descending</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>execute as @a run scoreboard players operation @s 备份金币 = @s 金币</td></tr>
+        </tbody>
+    </table>
+    <p>作用：实时同步在线玩家金币到备份计分板，离线玩家不占用列表显示。</p>
+
+    <h2>二、商品出售指令（金币 → 物品）</h2>
+
+    <h3>准备工作：创建商品结构</h3>
+    <ul style="color:#ccdbea; margin-left:20px;">
+        <li>放置一个 <code>structure_void</code>（<code>/give @s structure_void</code>）在购买点上方。</li>
+        <li>在 void 正上方丢出要卖的商品（如钻石）。</li>
+        <li>用结构方块保存范围（包含 void 和物品），命名如 <code>shop_dia</code>。</li>
+    </ul>
+
+    <h3>命令方块链（五个方块，箭头一致）</h3>
+    <p>以 100 金币购买 1 钻石为例：</p>
+    <table>
+        <thead>
+            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>title @p title §l§c您的金币不足</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players test @p 金币 * 100</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players remove @p 金币 100</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>title @p title §l§a购买成功</td></tr>
+            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>structure load 自己保存的对应商品的结构名称 &lt;对应坐标&gt;</td></tr>
+        </tbody>
+    </table>
+    <p> </p>
+
+    <h2>三、显示个人金币指令</h2>
+
+    <h3> </h3>
+    <table>
+        <thead>
+            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>tellraw @p {"rawtext":[{"text":"您的金币："},{"score":{"name":"@s","objective":"金币"}}]}</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+    <p style="text-align: right; color: #94aabb;">—— 部分参考图如下 具体指令以实际为准 ——</p>
+
+    <!-- 图片区域：仅插入图片，无注释 -->
+    <div class="image-row">
+        <img src="https://s41.ax1x.com/2026/03/11/pek81uq.jpg" alt="教程示例图1">
+        <img src="https://s41.ax1x.com/2026/03/11/pek8JET.jpg" alt="教程示例图2">
+    </div>
+</div>
+</body>
+</html>
