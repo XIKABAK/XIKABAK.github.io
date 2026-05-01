@@ -356,6 +356,8 @@ async function loadNotice() {
             });
         })
         .catch(() => { blogContainer.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#b37f5e;">渊面微澜，稍后再访</div>'; });
+    loadNotice();
+setInterval(loadNotice, 30000);
 </script>
 </body>
 </html>
