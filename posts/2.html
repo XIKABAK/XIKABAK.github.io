@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>基岩版 · 泥土金币商店 </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ffffff;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            padding: 3rem 2rem;
+            color: #2c241a;
+            line-height: 1.5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f0ec;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2cfbe;
+            border-radius: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 液态玻璃卡片 */
+        .post-card {
+            background: rgba(255, 255, 250, 0.6);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 0.5px solid rgba(220, 195, 170, 0.4);
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #b27b58;
+            font-size: 2.2rem;
+            margin-top: 0;
+            font-weight: 550;
+            letter-spacing: -0.01em;
+        }
+
+        h2 {
+            color: #b27b58;
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            border-left: 6px solid #e2cfbe;
+            padding-left: 1rem;
+            font-weight: 520;
+        }
+
+        h3 {
+            color: #c08a64;
+            font-size: 1.3rem;
+            margin: 1.5rem 0 0.8rem;
+            font-weight: 510;
+        }
+
+        /* 命令块 + 复制按钮容器 */
+        .cmd-container {
+            position: relative;
+            margin: 1.2rem 0;
+        }
+        .cmd-block {
+            background: #f5f0ea;
+            padding: 1rem 1.5rem;
+            border-radius: 1.2rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #5a3e2b;
+            border: 0.5px solid #e2cfbe;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            padding-right: 70px; /* 留出复制按钮空间 */
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: #f0e2d6;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #a27252;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: #e2cfbe;
+            color: #7b543a;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: #fcf8f2;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.03);
+        }
+        th {
+            background: #efe2d6;
+            color: #a06e4c;
+            font-weight: 600;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0e4d8;
+            font-family: 'Courier New', monospace;
+            color: #6b4f38;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 列表、段落等 */
+        ul, p {
+            color: #5a4a3a;
+            margin: 1rem 0;
+        }
+        code {
+            background: #f0e4d8;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.5rem;
+            font-size: 0.85em;
+            color: #ad6d48;
+        }
+        .note {
+            background: #f6ede4;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            color: #846248;
+            margin: 1.5rem 0;
+            border-left: 4px solid #e2cfbe;
+        }
+        hr {
+            border: 0.5px solid #f0e2d6;
+            margin: 2rem 0;
+        }
+        .date {
+            color: #b28866;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #e2cfbe;
+            padding-left: 1rem;
+        }
+        .image-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .image-row img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 1.2rem;
+            border: 1px solid #e2cfbe;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+        }
+        .back-home {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #b88b66;
+            text-decoration: none;
+            border-bottom: 1.5px dotted #e2cfbe;
+            font-size: 0.9rem;
+        }
+        .back-home:hover {
+            color: #9a6a48;
+        }
+        .footer-note {
+            text-align: right;
+            color: #bc9a7a;
+            font-size: 0.75rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="post-card">
+        <a href="../index.html" class="back-home">← 返回首页</a>
+        <h1>🧱 基岩版 · 泥土金币商店 · 完整指令教程</h1>
+        <div class="date">📅 2026-03-10 | 适用版本：1.20+ 基岩版/网易版</div>
+
+        <p>本教程使用 <strong>泥土</strong> 作为基础货币，通过计分板实现金币系统。包含：创建计分板、消除下线玩家、购买商店（structure加载物品）、显示个人金币。所有指令均已实测。</p>
+
+        <h2>一、金币计分板指令</h2>
+
+        <h3>1. 创建计分板（聊天框执行一次）</h3>
+        <div class="cmd-container">
+            <div class="cmd-block">/scoreboard objectives add 金币 dummy 金币<br>/scoreboard objectives add 备份金币 dummy 金币</div>
+            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+        </div>
+
+        <h3>2. 玩家下线处理（解决列表占用）</h3>
+        <p>放置四个命令方块，箭头方向一致，参数如下：</p>
+        <table>
+            <thead><tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr></thead>
+            <tbody>
+                <tr><td>循环</td><td>无条件</td><td>保持开启</td><td>scoreboard objectives remove 备份金币</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard objectives add 备份金币 dummy 金币</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>/scoreboard objectives setdisplay list 备份金币 descending</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>execute as @a run scoreboard players operation @s 备份金币 = @s 金币</td></tr>
+            </tbody>
+        </table>
+        <p>作用：实时同步在线玩家金币到备份计分板，离线玩家不占用列表显示。</p>
+
+        <h2>二、商品出售指令（金币 → 物品）</h2>
+
+        <h3>准备工作：创建商品结构</h3>
+        <ul>
+            <li>放置一个 <code>structure_void</code>（<code>/give @s structure_void</code>）在购买点上方。</li>
+            <li>在 void 正上方丢出要卖的商品（如钻石）。</li>
+            <li>用结构方块保存范围（包含 void 和物品），命名如 <code>shop_dia</code>。</li>
+        </ul>
+
+        <h3>命令方块链（五个方块，箭头一致）</h3>
+        <p>以 100 金币购买 1 钻石为例：</p>
+        <table>
+            <thead><tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr></thead>
+            <tbody>
+                <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>title @p title §l§c您的金币不足</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players test @p 金币 * 100</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players remove @p 金币 100</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>title @p title §l§a购买成功</td></tr>
+                <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>structure load 自己保存的对应商品的结构名称 &lt;对应坐标&gt;</td></tr>
+            </tbody>
+        </table>
+
+        <h2>三、显示个人金币指令</h2>
+        <div class="cmd-container">
+            <div class="cmd-block">tellraw @p {"rawtext":[{"text":"您的金币："},{"score":{"name":"@s","objective":"金币"}}]}</div>
+            <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
+        </div>
+
+        <!-- 原有图片区域 -->
+        <div class="image-row">
+            <img src="https://s41.ax1x.com/2026/03/11/pek81uq.jpg" alt="教程示例图1">
+            <img src="https://s41.ax1x.com/2026/03/11/pek8JET.jpg" alt="教程示例图2">
+        </div>
+
+        <hr>
+        <div class="footer-note">—— by xikabak ——</div>
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(btn) {
+        const container = btn.parentElement;
+        const codeBlock = container.querySelector('.cmd-block');
+        const text = codeBlock.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = btn.innerText;
+            btn.innerText = '已复制!';
+            setTimeout(() => { btn.innerText = originalText; }, 1500);
+        }).catch(() => {
+            alert('复制失败，请手动复制');
+        });
+    }
+</script>
+</body>
+</html>
