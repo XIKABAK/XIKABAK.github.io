@@ -304,22 +304,37 @@
     refreshImg(img1); refreshImg(img2);
 
     // 2. 动态加载公告（从 notice.json 读取最新一条）- 已适配 CSS 滚动结构
-    async function loadNotice() {
-        try {
-            const res = await fetch('notice.json?v=' + Date.now());
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            const latestMsg = data.latest || "✨ 服务器温暖在线，欢迎游玩 ✨";
-            // 修改：更新 .marquee-content 而非 marquee
-            const contentElem = document.querySelector('#noticeText .marquee-content');
-            if (contentElem) contentElem.innerText = latestMsg;
-        } catch(e) {
-            const contentElem = document.querySelector('#noticeText .marquee-content');
-            if (contentElem) contentElem.innerText = "✨ 服务器温暖在线，欢迎游玩 ✨";
+async function loadNotice() {
+    try {
+        const res = await fetch('notice.json?v=' + Date.now());
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        let latestMsg = data.latest || "✨ 服务器温暖在线，欢迎游玩 ✨";
+        const contentElem = document.querySelector('#noticeText .marquee-content');
+        if (contentElem) {
+            contentElem.innerText = latestMsg;
+            // 计算文本长度（以字符数为准）
+            const textLength = latestMsg.length;
+            let duration = 20; // 默认20秒
+            if (textLength <= 20) duration = 15;
+            else if (textLength <= 40) duration = 20;
+            else if (textLength <= 80) duration = 30;
+            else duration = 40;
+            // 获取 .marquee-wrap 元素并设置动画时长
+            const wrap = document.querySelector('#noticeText .marquee-wrap');
+            if (wrap) {
+                wrap.style.animationDuration = duration + 's';
+            }
+        }
+    } catch(e) {
+        const contentElem = document.querySelector('#noticeText .marquee-content');
+        if (contentElem) {
+            contentElem.innerText = "✨ 服务器温暖在线，欢迎游玩 ✨";
+            const wrap = document.querySelector('#noticeText .marquee-wrap');
+            if (wrap) wrap.style.animationDuration = '20s'; // 出错时恢复默认
         }
     }
-    loadNotice();
-    setInterval(loadNotice, 30000);
+}
 
     // 3. 博客动态加载（保留原有功能）
     const blogContainer = document.getElementById('blog-list');
