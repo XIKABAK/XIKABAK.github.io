@@ -207,14 +207,36 @@
         .readmore { color: #e39866; text-decoration: none; border-bottom: 1px solid #ecdaca; }
         .footer-note { text-align: center; font-size: 0.7rem; color: #cfa67f; margin-top: 2.5rem; border-top: 0.5px solid #eee1d5; padding-top: 1.5rem; }
 
-        @media (max-width: 760px) {
-            body { padding: 1.5rem; }
-            .site-title { font-size: 2.4rem; }
-            .server-card { flex-direction: column; text-align: center; }
-            .server-icon { margin: 0 auto; }
-            .notice-text { white-space: normal; }
-            .marquee-wrap { white-space: nowrap; }
-        }
+@media (max-width: 760px) {
+    /* 其他已有样式保留，只修改下面这段 */
+    .server-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+    .server-icon {
+        margin: 0 auto 0.5rem;
+    }
+    .server-info {
+        width: 100%;
+    }
+    .server-name {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    .server-badge {
+        margin: 0.3rem auto;
+    }
+    .server-detail {
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .server-detail span {
+        padding: 0.2rem 0.8rem;
+        font-size: 0.7rem;
+    }
+    /* 
+}
     </style>
 </head>
 <body>
