@@ -72,13 +72,26 @@
             color: #ad7a56;
             white-space: nowrap;
         }
-        .notice-text {
-            flex: 1;
-            overflow: hidden;
-            white-space: nowrap;
-            font-size: 0.85rem;
-            color: #9f7456;
-            font-weight: 450;
+.notice-text {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #9f7456;
+    font-weight: 450;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;          /* 表示可点击 */
+    position: relative;
+}
+#noticeContent {
+    display: inline-block;
+    transition: transform 0.3s linear;
+    will-change: transform;
+}
+/* 可选：添加一点悬停效果 */
+.notice-text:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}weight: 450;
         }
         .marquee-wrap {
             display: inline-block;
@@ -321,14 +334,13 @@
     </div>
 
     <!-- 滚动公告栏（CSS动画） -->
-    <div class="notice-bar" id="noticeBar">
-        <div class="notice-icon">✨ 即时公告</div>
-        <div class="notice-text" id="noticeText">
-            <div class="marquee-wrap">
-                <div class="marquee-content">加载中...</div>
-            </div>
-        </div>
+<!-- 滚动公告栏（新版JS控制） -->
+<div class="notice-bar" id="noticeBar">
+    <div class="notice-icon">✨ 即时公告</div>
+    <div class="notice-text" id="noticeText">
+        <span id="noticeContent">加载中...</span>
     </div>
+</div>
 
     <!-- 加入QQ群按钮 -->
     <div class="qq-group-btn">
@@ -401,41 +413,131 @@
 
     // 2. 动态加载公告（从 notice.json 读取，并根据文字长度自动调整滚动速度）
     async function loadNotice() {
-        try {
-            const res = await fetch('notice.json?v=' + Date.now());
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            let latestMsg = data.latest || "✨ 服务器温暖在线，欢迎游玩 ✨";
-            const contentElem = document.querySelector('#noticeText .marquee-content');
-            const wrap = document.querySelector('#noticeText .marquee-wrap');
-            if (contentElem && wrap) {
-                contentElem.innerText = latestMsg;
-                const textLength = latestMsg.length;
-                let duration = 20;
-                if (textLength <= 20) duration = 15;
-                else if (textLength <= 40) duration = 20;
-                else if (textLength <= 80) duration = 30;
-                else duration = 40;
-                // 重启动画
-                wrap.style.animation = 'none';
-                wrap.offsetHeight; // 强制重绘
-                wrap.style.animation = `marquee ${duration}s linear infinite`;
-            }
-        } catch(e) {
-            console.warn("公告加载失败，使用默认内容", e);
-            const contentElem = document.querySelector('#noticeText .marquee-content');
-            const wrap = document.querySelector('#noticeText .marquee-wrap');
-            if (contentElem && wrap) {
-                contentElem.innerText = "✨ 服务器温暖在线，欢迎游玩 ✨";
-                wrap.style.animation = 'none';
-                wrap.offsetHeight;
-                wrap.style.animation = 'marquee 20s linear infinite';
-            }
+let currentNotice = "";
+let scrollInterval = null;
+let isScrolling = false;
+let scrollSpeed = 30; // px/秒，可调
+
+// 获取公告内容并重置滚动
+async function loadNotice() {
+    try {
+        const res = await fetch('notice.json?v=' + Date.now());
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        let latestMsg = data.latest || "✨ 服务器温暖在线，欢迎游玩 ✨";
+        if (latestMsg === currentNotice) return; // 相同内容不重启
+        currentNotice = latestMsg;
+        
+        const container = document.getElementById('noticeContent');
+        container.innerText = latestMsg;
+        
+        // 重置滚动（停止当前动画）
+        if (scrollInterval) clearInterval(scrollInterval);
+        isScrolling = false;
+        container.style.transform = "translateX(0)";
+        
+        // 启动滚动 (如果文本宽度超出父容器)
+        startScrollIfNeeded();
+    } catch(e) {
+        console.warn("公告加载失败", e);
+        const container = document.getElementById('noticeContent');
+        if (container && container.innerText === "加载中...") {
+            container.innerText = "✨ 服务器温暖在线，欢迎游玩 ✨";
+            currentNotice = container.innerText;
+            startScrollIfNeeded();
         }
     }
-    loadNotice();
-    setInterval(loadNotice, 30000);
+}
 
+function startScrollIfNeeded() {
+    const container = document.getElementById('noticeContent');
+    const parent = document.querySelector('.notice-text');
+    if (!container || !parent) return;
+    
+    // 重置位置
+    container.style.transform = "translateX(0)";
+    if (scrollInterval) clearInterval(scrollInterval);
+    isScrolling = false;
+    
+    // 检查是否需要滚动
+    const containerWidth = container.scrollWidth;
+    const parentWidth = parent.clientWidth;
+    
+    if (containerWidth <= parentWidth) {
+        // 文本短，无需滚动，保持静止
+        return;
+    }
+    
+    // 需要滚动：计算滚动距离 (containerWidth - parentWidth + 20px 缓冲)
+    const distance = containerWidth - parentWidth + 20;
+    const duration = distance / scrollSpeed; // 秒
+    const step = distance / (duration * 60); // 每帧移动px（假设60fps）
+    
+    let pos = 0;
+    isScrolling = true;
+    scrollInterval = setInterval(() => {
+        if (!isScrolling) return;
+        pos -= step;
+        if (pos <= -distance) {
+            // 滚动完成，等待停留时间（10秒）后重新开始
+            clearInterval(scrollInterval);
+            isScrolling = false;
+            setTimeout(() => {
+                // 重置位置并重新滚动
+                if (container.innerText === currentNotice) {
+                    container.style.transform = "translateX(0)";
+                    startScrollIfNeeded();
+                }
+            }, 10000); // 停顿10秒
+            return;
+        }
+        container.style.transform = `translateX(${pos}px)`;
+    }, 1000 / 60);
+}
+
+// 点击公告栏显示完整内容（模态框或alert）
+function setupNoticeClick() {
+    const noticeDiv = document.querySelector('.notice-text');
+    if (!noticeDiv) return;
+    noticeDiv.addEventListener('click', () => {
+        const fullText = currentNotice || document.getElementById('noticeContent')?.innerText || "暂无公告";
+        // 使用 sweetalert? 最简单用浏览器自带 alert，但样式不好看。这里用模态框。
+        // 为了简单且不引入外部库，使用一个固定位置的浮动层。
+        let modal = document.getElementById('noticeModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'noticeModal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 10000; visibility: hidden; transition: visibility 0.2s;
+            `;
+            modal.innerHTML = `
+                <div style="background: #fff; max-width: 90%; max-height: 80%; overflow: auto; padding: 1.5rem; border-radius: 2rem; border: 0.5px solid #e2cfbe; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">📢 完整公告</div>
+                    <div id="modalContent" style="white-space: pre-wrap; word-break: break-word; line-height: 1.5;"></div>
+                    <button id="closeModal" style="margin-top: 1rem; padding: 0.3rem 1rem; border-radius: 2rem; border: none; background: #efe2d6; cursor: pointer;">关闭</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeModal').onclick = () => {
+                modal.style.visibility = 'hidden';
+            };
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.visibility = 'hidden';
+            });
+        }
+        const modalContent = document.getElementById('modalContent');
+        if (modalContent) modalContent.innerText = fullText;
+        modal.style.visibility = 'visible';
+    });
+}
+
+// 初始化
+loadNotice();
+setInterval(loadNotice, 30000); // 30秒检查一次新公告
+setupNoticeClick();
     // 3. 博客动态加载
     const blogContainer = document.getElementById('blog-list');
     fetch('posts/index.json')
