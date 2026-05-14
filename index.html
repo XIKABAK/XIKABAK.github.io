@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>西卡游戏</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #1e2f3d;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 全屏背景层（清晰原图，无模糊） */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            opacity: 0;
+        }
+        .bg-img.loaded {
+            opacity: 1;
+        }
+        /* 半透白遮罩 */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            z-index: -1;
+        }
+
+        /* 主布局 */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 210px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 1.2rem 0.6rem;
+            border: 0.5px solid rgba(200, 215, 225, 0.5);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .site-title-sidebar {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2c5a7a;
+            margin-bottom: 1.2rem;
+            padding: 0 0.8rem;
+            letter-spacing: -0.3px;
+            border-left: 3px solid #7cb5d9;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.3rem 0;
+            border-radius: 36px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #3a5f7a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nav-item i {
+            font-style: normal;
+            font-weight: 600;
+            width: 28px;
+            font-size: 1.2rem;
+        }
+        .nav-item.active {
+            background: #eef4fa;
+            color: #2c6a8e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border-left: 3px solid #7cb5d9;
+        }
+        .nav-item:not(.active):hover {
+            background: rgba(230, 242, 250, 0.6);
+        }
+
+        /* 右侧主内容区 */
+        .main-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 36px;
+            padding: 1.8rem 2rem;
+            border: 0.5px solid rgba(210, 225, 235, 0.6);
+        }
+
+        /* 页面切换容器 */
+        .page-container {
+            position: relative;
+            min-height: 480px;
+        }
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: opacity 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.35s ease;
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+        }
+        .page.active {
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* 共用卡片 */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 28px;
+            padding: 1.2rem 1.5rem;
+            border: 0.5px solid rgba(200, 218, 230, 0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        /* ========= 首页布局（公告栏 + 垂直居中的按钮） ========= */
+        #homePage {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: inherit;
+        }
+        .notice-header {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        /* 公告栏样式 —— 强制单行 + 溢出隐藏 */
+        .notice-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 60px;
+            padding: 0.4rem 1rem;
+            border: 0.5px solid rgba(124, 181, 217, 0.3);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .notice-icon {
+            background: #d9eaff;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2c5a7a;
+            white-space: nowrap;
+        }
+        .notice-text {
+            flex: 1;
+            min-width: 0;               /* 防止flex溢出 */
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            color: #3a6a8a;
+        }
+        #noticeContent {
+            display: inline-block;
+            white-space: nowrap !important;  /* 强制不换行 */
+            transition: transform 0.3s linear;
+            will-change: transform;
+        }
+        .join-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .join-main-btn {
+            background: #7cb5d9;
+            border: none;
+            border-radius: 50px;
+            padding: 0.7rem 2.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .join-main-btn:hover {
+            background: #5a9bc2;
+            transform: scale(1.02);
+        }
+
+        /* 服务器卡片 */
+        .server-card {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .server-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+        .server-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c5a7a;
+        }
+        .server-badge {
+            background: #eef4fa;
+            padding: 0.15rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            width: fit-content;
+            margin: 0.3rem 0;
+            color: #5a7f9a;
+        }
+        .server-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+        .server-detail span {
+            background: #f5faff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            color: #5a6e82;
+        }
+
+        /* 博客网格 */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.2rem;
+        }
+        .blog-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 28px;
+            padding: 1.2rem;
+            border: 0.5px solid rgba(200, 218, 230, 0.6);
+            transition: 0.2s;
+        }
+        .blog-card:hover {
+            transform: translateY(-2px);
+            background: white;
+        }
+        .blog-date {
+            font-size: 0.7rem;
+            color: #7c9ec0;
+        }
+        .blog-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c5a7a;
+            margin: 0.3rem 0;
+        }
+        .blog-excerpt {
+            font-size: 0.8rem;
+            color: #5a6e82;
+            margin-bottom: 0.6rem;
+        }
+        .readmore {
+            color: #7cb5d9;
+            text-decoration: none;
+            border-bottom: 1px solid #cbe0f0;
+            font-size: 0.8rem;
+        }
+
+        /* 大弹窗 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            transition: visibility 0.2s;
+        }
+        .modal.active {
+            visibility: visible;
+        }
+        .modal-content {
+            background: #ffffff;
+            width: 80%;
+            max-width: 800px;
+            height: 80%;
+            max-height: 80vh;
+            border-radius: 48px;
+            padding: 2rem;
+            overflow-y: auto;
+            border: 0.5px solid #d9e6f2;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c5a7a;
+        }
+        .modal-content p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #2c3e50;
+            white-space: pre-wrap;
+            flex: 1;
+        }
+        .modal-content button {
+            align-self: flex-end;
+            background: #eef2f8;
+            border: none;
+            padding: 0.5rem 1.8rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2c5a7a;
+            cursor: pointer;
+            margin-top: 1.2rem;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            color: #aac4d6;
+            padding: 2rem;
+        }
+
+        @media (max-width: 800px) {
+            .app-layout { flex-direction: column; padding: 1rem; }
+            .sidebar { width: 100%; display: flex; flex-wrap: wrap; gap: 0.5rem; position: static; padding: 0.8rem; min-height: auto; }
+            .site-title-sidebar { width: 100%; margin-bottom: 0.5rem; padding-left: 1rem; }
+            .nav-item { flex: 1; justify-content: center; }
+            .main-content { padding: 1.2rem; }
+            .modal-content { width: 90%; height: 70%; }
+            .notice-text { white-space: nowrap; }   /* 保证手机也不换行 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 全屏背景层 -->
+    <div class="bg-layer" id="bgLayer">
+        <img class="bg-img" id="bgImg" alt="背景">
+    </div>
+    <div class="bg-overlay"></div>
+
+    <div class="app-layout">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="site-title-sidebar">西卡游戏</div>
+            <div class="nav-item active" data-page="home">
+                <i>🏠</i> 首页
+            </div>
+            <div class="nav-item" data-page="servers">
+                <i>🎮</i> 服务器
+            </div>
+            <div class="nav-item" data-page="blog">
+                <i>📖</i> 博客
+            </div>
+        </div>
+
+        <!-- 右侧主要内容区 -->
+        <div class="main-content">
+            <div class="page-container">
+                <!-- 首页页面 -->
+                <div id="homePage" class="page active">
+                    <div class="notice-header">
+                        <div class="notice-bar" id="noticeBar">
+                            <div class="notice-icon">📢 公告</div>
+                            <div class="notice-text" id="noticeText">
+                                <span id="noticeContent">加载中...</span>
+                            </div>
+                        </div>
+                        <div class="join-wrapper">
+                            <a href="https://qun.qq.com/universal-share/share?ac=1&authKey=2kkzYjTgE9JGej83s1o9wLXbd24f7b8XeCoHdAs5ATNCdyjv6WSAbQJnTbuGZOc%2F&busi_data=eyJncm91cENvZGUiOiIxMDc1OTMyODQ0IiwidG9rZW4iOiJVOGlSVDBzVkhDZkVGV2lhbXNYUmw0Uk1Rd1BHQWdSNjRyVjdoK1MzSzIxZ3FBSy83Y3hnTFgrWGx2d3ZJYTByIiwidWluIjoiOTQyNDAzNDU2In0%3D&data=-oW4oOB1A-_eaDR7oK7nfM-12kVuaV8BapovFKg5174lb3OxVfdXp4ZSRV5Ze9C73wK_-iWwkMXsAvCvWa0-ww&svctype=4&tempid=h5_group_info" target="_blank" class="join-main-btn">➕ 加入我们</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 服务器页面 -->
+                <div id="serversPage" class="page">
+                    <div class="server-card card">
+                        <div class="server-icon" style="background-image: url('https://s41.ax1x.com/2026/03/08/pePzRVe.png');"></div>
+                        <div class="server-info">
+                            <div class="server-name">网易版我的世界</div>
+                            <div class="server-badge">基岩 · 移动特供</div>
+                            <div class="server-detail">
+                                <span>⚓ 1604295</span>
+                                <span>👥 20位</span>
+                                <span>❄️ 雪球菜单</span>
+                                <span>🕊️ 死亡传送</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="server-card card">
+                        <div class="server-icon" style="background-image: url('https://s41.ax1x.com/2026/03/08/pePzWUH.jpg');"></div>
+                        <div class="server-info">
+                            <div class="server-name">xikabak-services</div>
+                            <div class="server-badge">憩息 · 小游戏</div>
+                            <div class="server-detail">
+                                <span>✨ 酿造中</span>
+                                <span>暂未开放</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-placeholder">没有更多服务器啦</div>
+                </div>
+
+                <!-- 博客页面 -->
+                <div id="blogPage" class="page">
+                    <div id="blogList" class="blog-grid">
+                        <div class="empty-placeholder" style="grid-column:1/-1;">正在加载...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 大尺寸弹窗 -->
+    <div id="noticeModal" class="modal">
+        <div class="modal-content">
+            <h3>📢 完整公告</h3>
+            <p id="modalFullText"></p>
+            <button id="closeModalBtn">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== 背景轮播（不变） ==========
+        const bgImageList = [
+            "https://s41.ax1x.com/2026/05/14/pejnS3T.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejmjNq.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejmv40.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejn9vF.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejmzCV.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejniDJ.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejnFb9.jpg",
+            "https://s41.ax1x.com/2026/05/14/pejnPu4.jpg"
+        ];
+        const bgImg = document.getElementById('bgImg');
+        let currentBg = 0;
+        function changeBackground(index) {
+            const url = bgImageList[index % bgImageList.length];
+            bgImg.classList.remove('loaded');
+            const temp = new Image();
+            temp.onload = () => {
+                bgImg.src = url;
+                setTimeout(() => bgImg.classList.add('loaded'), 30);
+            };
+            temp.src = url;
+        }
+        function randomBg() {
+            let newIdx = Math.floor(Math.random() * bgImageList.length);
+            if (newIdx === currentBg && bgImageList.length > 1) newIdx = (newIdx + 1) % bgImageList.length;
+            currentBg = newIdx;
+            changeBackground(currentBg);
+        }
+        currentBg = Math.floor(Math.random() * bgImageList.length);
+        changeBackground(currentBg);
+        setInterval(randomBg, 30000);
+
+        // ========== 公告滚动 + 弹窗（彻底修复长文本问题） ==========
+        let currentNoticeText = "";
+        let scrollInterval = null;
+        let isScrolling = false;
+        const SCROLL_SPEED = 35;
+
+        // 核心滚动函数（带重试机制）
+        function startScrollIfNeeded(retryCount = 0) {
+            const container = document.getElementById('noticeContent');
+            const parent = document.querySelector('.notice-text');
+            if (!container || !parent) return;
+            // 重置位置并清除旧动画
+            container.style.transform = "translateX(0)";
+            if (scrollInterval) clearInterval(scrollInterval);
+            isScrolling = false;
+            // 获取宽度
+            let containerWidth = container.scrollWidth;
+            let parentWidth = parent.clientWidth;
+            // 如果父容器宽度为0或内容尚未渲染，延迟重试（最多3次）
+            if (parentWidth === 0 && retryCount < 3) {
+                setTimeout(() => startScrollIfNeeded(retryCount + 1), 100);
+                return;
+            }
+            // 如果文本宽度小于等于父容器宽度，无需滚动
+            if (containerWidth <= parentWidth) return;
+            const distance = containerWidth - parentWidth + 20;
+            const duration = distance / SCROLL_SPEED;
+            const step = distance / (duration * 60);
+            let pos = 0;
+            isScrolling = true;
+            scrollInterval = setInterval(() => {
+                if (!isScrolling) return;
+                pos -= step;
+                if (pos <= -distance) {
+                    // 滚动完成，等待10秒后重新开始
+                    clearInterval(scrollInterval);
+                    isScrolling = false;
+                    setTimeout(() => {
+                        // 重新滚动前检查文本是否变化
+                        if (document.getElementById('noticeContent')?.innerText === currentNoticeText) {
+                            container.style.transform = "translateX(0)";
+                            startScrollIfNeeded();
+                        }
+                    }, 10000);
+                    return;
+                }
+                container.style.transform = `translateX(${pos}px)`;
+            }, 1000 / 60);
+        }
+
+        async function loadNotice() {
+            try {
+                const res = await fetch('notice.json?v=' + Date.now());
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                let msg = data.latest || "✨ 服务器温暖在线，欢迎游玩 ✨";
+                if (msg === currentNoticeText) return;
+                currentNoticeText = msg;
+                const noticeSpan = document.getElementById('noticeContent');
+                if (noticeSpan) {
+                    noticeSpan.innerText = msg;
+                    // 清除之前的滚动
+                    if (scrollInterval) clearInterval(scrollInterval);
+                    noticeSpan.style.transform = "translateX(0)";
+                    isScrolling = false;
+                    // 延迟确保 DOM 完全更新后再启动滚动（避免宽度计算错误）
+                    setTimeout(() => startScrollIfNeeded(), 50);
+                }
+            } catch(e) {
+                const fallback = "✨ 服务器温暖在线，欢迎游玩 ✨";
+                if (!currentNoticeText) currentNoticeText = fallback;
+                const noticeSpan = document.getElementById('noticeContent');
+                if (noticeSpan && noticeSpan.innerText === "加载中...") {
+                    noticeSpan.innerText = fallback;
+                    setTimeout(() => startScrollIfNeeded(), 50);
+                }
+            }
+        }
+
+        // 监听窗口大小变化，重新计算滚动
+        window.addEventListener('resize', () => {
+            if (currentNoticeText) {
+                if (scrollInterval) clearInterval(scrollInterval);
+                const container = document.getElementById('noticeContent');
+                if (container) container.style.transform = "translateX(0)";
+                setTimeout(() => startScrollIfNeeded(), 100);
+            }
+        });
+
+        loadNotice();
+        setInterval(loadNotice, 30000);
+
+        // 弹窗逻辑
+        const modal = document.getElementById('noticeModal');
+        const modalText = document.getElementById('modalFullText');
+        const noticeBarDiv = document.getElementById('noticeBar');
+        noticeBarDiv.addEventListener('click', (e) => {
+            if (e.target.closest('.join-main-btn')) return;
+            const full = currentNoticeText || document.getElementById('noticeContent')?.innerText || "暂无公告";
+            modalText.innerText = full;
+            modal.classList.add('active');
+        });
+        document.getElementById('closeModalBtn').onclick = () => modal.classList.remove('active');
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+        // ========== 左侧导航 + 页面切换（不变） ==========
+        const pages = {
+            home: document.getElementById('homePage'),
+            servers: document.getElementById('serversPage'),
+            blog: document.getElementById('blogPage')
+        };
+        const navButtons = document.querySelectorAll('.nav-item');
+        function switchToPage(pageId) {
+            Object.values(pages).forEach(page => {
+                page.classList.remove('active');
+            });
+            pages[pageId].classList.add('active');
+            navButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-page') === pageId) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const page = btn.getAttribute('data-page');
+                switchToPage(page);
+            });
+        });
+        switchToPage('home');
+
+        // ========== 博客动态加载（不变） ==========
+        const blogContainer = document.getElementById('blogList');
+        async function loadBlogs() {
+            try {
+                const res = await fetch('posts/index.json');
+                if (!res.ok) throw new Error();
+                const posts = await res.json();
+                blogContainer.innerHTML = '';
+                if (!posts.length) {
+                    blogContainer.innerHTML = '<div class="empty-placeholder" style="grid-column:1/-1;">暂无帖子</div>';
+                    return;
+                }
+                posts.forEach(post => {
+                    const card = document.createElement('div');
+                    card.className = 'blog-card';
+                    card.innerHTML = `
+                        <div class="blog-date">📅 ${post.date}</div>
+                        <div class="blog-title">${post.title}</div>
+                        <div class="blog-excerpt">${post.excerpt}</div>
+                        <a href="posts/${post.file}" class="readmore">阅读帖子 →</a>
+                    `;
+                    blogContainer.appendChild(card);
+                });
+            } catch(e) {
+                blogContainer.innerHTML = '<div class="empty-placeholder" style="grid-column:1/-1;">服务器断开连接</div>';
+            }
+        }
+        loadBlogs();
+    </script>
+</body>
+</html>
