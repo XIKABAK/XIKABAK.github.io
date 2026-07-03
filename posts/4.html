@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f5f5; color: #2c3e50; font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.7; padding: 20px; }
+        .post-container { max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 30px; padding: 32px 40px; }
+        .back-home { display: inline-block; margin-bottom: 20px; color: #1a73e8; text-decoration: none; border-bottom: 2px dotted; }
+        h1 { color: #1e2f3d; font-size: 28px; margin-bottom: 6px; }
+        .post-date { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
+        .post-excerpt { color: #555; font-size: 1rem; margin-bottom: 24px; padding: 12px 16px; background: #f8f9fa; border-radius: 10px; border-left: 3px solid #7cb5d9; }
+        .post-body { color: #2c3e50; font-size: 16px; line-height: 1.8; }
+        .post-body img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; }
+        .post-body a { color: #1a73e8; }
+        .post-body blockquote { border-left: 4px solid #7cb5d9; padding: 12px 20px; margin: 16px 0; background: rgba(124,181,217,0.08); border-radius: 0 8px 8px 0; }
+        .post-body video { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; background: #000; }
+        .post-body table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+        .post-body td, .post-body th { border: 1px solid #555; padding: 6px 10px; }
+        .post-body th { background: rgba(255,255,255,0.08); font-weight: bold; }
+        /* WPS heading styles */
+        .post-body .wps-big-title, .wps-big-title { font-size: 26px; font-weight: 700; line-height: 1.3; margin: 12px 0 6px; }
+        .post-body .wps-title1, .wps-title1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin: 10px 0 5px; }
+        .post-body .wps-title2, .wps-title2 { font-size: 19px; font-weight: 600; line-height: 1.4; margin: 8px 0 4px; }
+        .post-body .wps-title3, .wps-title3 { font-size: 17px; font-weight: 600; line-height: 1.45; margin: 6px 0 3px; }
+        .post-body .wps-subtitle, .wps-subtitle { font-size: 15px; font-weight: 500; line-height: 1.5; margin: 6px 0 3px; color: #888; }
+        .post-body .wps-small-title, .wps-small-title { font-size: 14px; font-weight: 600; line-height: 1.5; margin: 4px 0 2px; color: #555; }
+        /* WPS frame styles */
+        .post-body .wps-frame-simple, .wps-frame-simple { border: 1px solid #ddd; border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+        .post-body .wps-frame-shadow, .wps-frame-shadow { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin: 10px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .post-body .wps-frame-accent, .wps-frame-accent { border-left: 4px solid #1a73e8; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #f0f6ff; }
+        .post-body .wps-frame-warn, .wps-frame-warn { border-left: 4px solid #f57c00; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #fff8e1; }
+        .post-body .wps-frame-success, .wps-frame-success { border-left: 4px solid #388e3c; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #e8f5e9; }
+        .post-body .wps-frame-dashed, .wps-frame-dashed { border: 2px dashed #bbb; border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+        .post-body .wps-frame-gradient, .wps-frame-gradient { border: none; border-radius: 10px; padding: 12px 16px; margin: 10px 0; background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; }
+        .post-body .wps-frame-dark, .wps-frame-dark { border: none; border-radius: 8px; padding: 10px 14px; margin: 10px 0; background: #1e2f3d; color: #e0e0e0; }
+        /* WPS text effects */
+        .post-body .wps-glow, .wps-glow { text-shadow: 0 0 8px rgba(26,115,232,0.6); }
+        .post-body .wps-shadow, .wps-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .post-body .wps-outline, .wps-outline { text-shadow: -1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000; color: #fff; }
+        /* WPS masks */
+        .post-body .wps-mask, .wps-mask { background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .post-body .wps-mask-primary, .wps-mask-primary { background: rgba(26,115,232,0.1); padding: 4px 8px; border-radius: 4px; }
+        .post-body .wps-mask-warn, .wps-mask-warn { background: rgba(245,124,0,0.1); padding: 4px 8px; border-radius: 4px; }
+        .post-body .wps-mask-success, .wps-mask-success { background: rgba(56,142,60,0.1); padding: 4px 8px; border-radius: 4px; }
+        .post-body .wps-mask-dark, .wps-mask-dark { background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 4px; }
+        /* WPS badges */
+        .post-body .wps-badge, .wps-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: #fff; background: #1a73e8; margin: 2px; }
+        .post-body .wps-badge-red, .wps-badge-red { background: #e53935; }
+        .post-body .wps-badge-green, .wps-badge-green { background: #388e3c; }
+        .post-body .wps-badge-orange, .wps-badge-orange { background: #f57c00; }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <a href="../index.html" class="back-home">← 返回首页</a>
+        <h1>测试</h1>
+        <div class="post-date">📅 2026-07-03测</div>
+        <div class="post-excerpt">测试</div>
+        <div class="post-body"><img src="https://raw.githubusercontent.com/XIKABAK/XIKABAK.github.io/main/posts/media/Screenshot_2026-06-15-23-22-27-56_5c8300b655012b1930f2e0a7b81bf6a9.jpg" alt="图片" style="max-width: 100%; border-radius: 6px; margin: 6px 0px;"><div style="border:1px solid #ddd;border-radius:6px;padding:12px;margin:8px 0;text-align:center;"><p style="margin-bottom:6px;">📎</p><p style="font-weight:bold;margin-bottom:8px;">番2梧桐巷作者宋澈不吃鱼.docx</p><a href="https://raw.githubusercontent.com/XIKABAK/XIKABAK.github.io/main/posts/media/番2梧桐巷作者宋澈不吃鱼.docx" target="_blank" style="display:inline-block;padding:6px 16px;background:#1a73e8;color:#fff;border-radius:6px;text-decoration:none;">下载文件</a></div><div style="border:1px solid #ddd;border-radius:6px;padding:10px;margin:8px 0;"><p style="font-weight:bold;margin-bottom:6px;">📄 白板_1781832802031.pdf</p><a href="https://raw.githubusercontent.com/XIKABAK/XIKABAK.github.io/main/posts/media/白板_1781832802031.pdf" target="_blank" style="color:#1a73e8;">打开PDF</a></div><br><div><font size="7" color="#ff9900"><i style=""><b style=""><u><strike>123</strike></u></b></i></font></div><div><a href="https://www.kdocs.cn/l/cv7dqkEpe5uG" target="_blank">跳转链接</a><font size="7" color="#ff9900"><i style=""><b style=""><u><strike></strike></u></b></i></font></div><div><br></div><blockquote><p>123</p><p><br></p></blockquote><div class="wps-frame-success"><p style="margin: 4px 0px;">123</p><p style="margin: 4px 0px;"><br></p></div><div class="wps-frame-dashed"><p style="margin: 4px 0px;">123</p><p style="margin: 4px 0px;"><br></p></div><div class="wps-frame-simple"><p style="margin: 4px 0px;">123&nbsp;</p><p style="margin: 4px 0px;"><strike>1<sub>23<font size="7">268</font><font size="4">8</font><font size="5">78<table><tbody><tr><td><b>列1</b></td><td><b>列2</b></td><td><b>列3</b></td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><br></font></sub></strike></p><p style="text-align: center; margin: 4px 0px;"><strike><sub><font size="5">223</font></sub></strike></p><p style="text-align: right; margin: 4px 0px;"><strike><sub><font size="5">223</font></sub></strike></p><p style="text-align: justify; margin: 4px 0px;"><strike><sub><font size="5">223</font></sub></strike></p><p style="text-align: justify; margin: 4px 0px;"><ul><li><strike><sub><font size="5">123</font></sub></strike></li></ul><ol><li><font size="5"><strike>123</strike></font></li><li><font size="5"><strike>123</strike></font></li><li><font size="5"><strike></strike></font></li></ol></p><hr id="null">123</div><hr id="null"><p class="wps-big-title">123</p><p class="wps-big-title"><br></p><p class="wps-small-title">123</p><p class="wps-small-title"><br></p><p class="wps-title1">12分钟</p><p class="wps-title1"><br></p></div>
+    </div>
+</body>
+</html>
