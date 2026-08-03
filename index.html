@@ -24,10 +24,13 @@
             color: inherit;
         }
 
-        /* ===== 背景 ===== */
+        /* ===== 背景（固定视口，不随滚动变化） ===== */
         .bg-layer {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             z-index: -2;
             overflow: hidden;
         }
@@ -43,7 +46,10 @@
         }
         .bg-overlay {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: rgba(255, 255, 255, 0.75);
             z-index: -1;
         }
@@ -166,7 +172,7 @@
             border-radius: 36px;
             padding: 1.8rem 2rem;
             border: 0.5px solid rgba(210, 225, 235, 0.6);
-            min-height: 60vh;
+            min-height: 80vh; /* 确保背景至少覆盖大部分屏幕 */
         }
 
         /* ===== 页面切换 ===== */
@@ -201,7 +207,7 @@
         .home-wrapper {
             display: flex;
             flex-direction: column;
-            min-height: 400px;
+            min-height: 60vh; /* 手机端足够撑满 */
             justify-content: space-between;
         }
         .notice-bar {
@@ -676,6 +682,10 @@
             .main {
                 padding: 1.2rem 1rem;
                 border-radius: 28px;
+                min-height: 70vh; /* 手机端稍小一点 */
+            }
+            .home-wrapper {
+                min-height: 50vh;
             }
             .notice-bar {
                 flex-wrap: nowrap;
