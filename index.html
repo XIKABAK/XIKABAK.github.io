@@ -424,6 +424,13 @@
             overflow-x: auto;
             font-size: 0.85rem;
             border: 1px solid #f0d6d6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .error-box .hint {
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #7c9ec0;
         }
 
         /* ===== 申明 ===== */
@@ -810,9 +817,9 @@
 
             <!-- ===== 博客 ===== -->
             <section id="page-blog" class="page">
-                <!-- 博客卡片容器 -->
-                <div class="blog-grid" id="blogList"></div>
-                <!-- 错误报告容器 -->
+                <div class="blog-grid" id="blogList">
+                    <!-- 动态加载 -->
+                </div>
                 <div id="blogError" style="display:none;" class="error-box"></div>
             </section>
 
@@ -1011,34 +1018,12 @@
         overlay.addEventListener('click', closeSidebar);
 
         // ================================================================
-        //  5. 博客数据（在这里添加您的帖子）
-        // ================================================================
-        const posts = [{
-            title: '西卡游戏正式上线',
-            date: '2025-06-01',
-            excerpt: '欢迎来到西卡游戏社区！我们致力于为玩家提供优质的联机体验。',
-            author: '站长',
-            file: 'welcome.html'
-        }, {
-            title: '服务器更新日志 v1.2',
-            date: '2025-06-05',
-            excerpt: '新增雪球菜单、死亡传送功能，修复了若干已知问题。',
-            author: '技术组',
-            file: 'update.html'
-        }, {
-            title: '建筑大赛报名开启',
-            date: '2025-06-10',
-            excerpt: '本月将举办第一届西卡建筑大赛，优胜者将获得专属称号。',
-            author: '活动组',
-            file: 'build-contest.html'
-        }];
-
-        // ================================================================
-        //  6. 渲染博客（带错误捕获）
+        //  5. 博客加载（使用 fetch 动态加载 index.json）
         // ================================================================
         const blogList = document.getElementById('blogList');
         const errorBox = document.getElementById('blogError');
 
+        // 辅助函数
         function getInitials(name) {
             if (!name) return '?';
             return name.trim().charAt(0).toUpperCase();
@@ -1052,73 +1037,91 @@
             return `hsl(${(hash % 360 + 200) % 360}, 55%, 75%)`;
         }
 
-        function renderBlogs() {
-            try {
-                blogList.innerHTML = '';
-                errorBox.style.display = 'none';
+        // 渲染函数
+        function renderBlogs(posts) {
+            blogList.innerHTML = '';
+            errorBox.style.display = 'none';
 
-                // 检查数据
-                if (!posts || !Array.isArray(posts)) {
-                    throw new Error('帖子数据 posts 不是有效数组，请检查变量定义。');
-                }
-                if (posts.length === 0) {
-                    blogList.innerHTML = '<div class="empty-placeholder">📭 暂无帖子</div>';
-                    return;
-                }
+            if (!posts || !Array.isArray(posts) || posts.length === 0) {
+                blogList.innerHTML = '<div class="empty-placeholder">📭 暂无帖子</div>';
+                return;
+            }
 
-                // 生成卡片
-                posts.forEach((post, index) => {
-                    // 字段校验
-                    if (!post.title) console.warn(`⚠️ 帖子 #${index} 缺少 title`);
-                    if (!post.file) console.warn(`⚠️ 帖子 #${index} 缺少 file`);
-
-                    const author = post.author || '匿名';
-                    const initials = getInitials(author);
-                    const color = getAvatarColor(author);
-                    const card = document.createElement('div');
-                    card.className = 'blog-card';
-                    card.innerHTML = `
-                        <div class="blog-meta">
-                            <div class="blog-avatar" style="background:${color};">${initials}</div>
-                            <span class="blog-author">${author}</span>
-                            <span class="blog-date">📅 ${post.date || '未知日期'}</span>
-                        </div>
-                        <div class="blog-title">${post.title || '无标题'}</div>
-                        <div class="blog-excerpt">${post.excerpt || ''}</div>
-                        <div class="blog-footer">
-                            <span class="readmore" data-url="posts/${post.file}">阅读帖子 →</span>
-                            <span class="blog-tag"># 博客</span>
-                        </div>
-                    `;
-                    const readmore = card.querySelector('.readmore');
-                    readmore.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const url = this.dataset.url;
-                        if (typeof openPost === 'function') {
-                            openPost(url);
-                        } else {
-                            alert('帖子阅读功能未初始化，请检查控制台错误。');
-                        }
-                    });
-                    blogList.appendChild(card);
+            posts.forEach((post, index) => {
+                const author = post.author || '匿名';
+                const initials = getInitials(author);
+                const color = getAvatarColor(author);
+                const card = document.createElement('div');
+                card.className = 'blog-card';
+                card.innerHTML = `
+                    <div class="blog-meta">
+                        <div class="blog-avatar" style="background:${color};">${initials}</div>
+                        <span class="blog-author">${author}</span>
+                        <span class="blog-date">📅 ${post.date || '未知日期'}</span>
+                    </div>
+                    <div class="blog-title">${post.title || '无标题'}</div>
+                    <div class="blog-excerpt">${post.excerpt || ''}</div>
+                    <div class="blog-footer">
+                        <span class="readmore" data-url="posts/${post.file}">阅读帖子 →</span>
+                        <span class="blog-tag"># 博客</span>
+                    </div>
+                `;
+                const readmore = card.querySelector('.readmore');
+                readmore.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.dataset.url;
+                    if (typeof openPost === 'function') {
+                        openPost(url);
+                    } else {
+                        alert('帖子阅读功能未初始化，请检查控制台错误。');
+                    }
                 });
+                blogList.appendChild(card);
+            });
+            console.log(`✅ 成功渲染 ${posts.length} 篇帖子`);
+        }
 
-                console.log(`✅ 成功渲染 ${posts.length} 篇帖子`);
+        // 加载函数（带详细错误捕获）
+        async function loadBlogs() {
+            try {
+                const response = await fetch('posts/index.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} ${response.statusText} — 文件 posts/index.json 不存在或无法访问`);
+                }
+                const text = await response.text();
+                let posts;
+                try {
+                    posts = JSON.parse(text);
+                } catch (parseError) {
+                    throw new Error(`JSON 解析失败: ${parseError.message}\n请检查 posts/index.json 格式是否正确（使用双引号，无尾随逗号）。`);
+                }
+                if (!Array.isArray(posts)) {
+                    throw new Error('posts/index.json 内容不是数组，请确保根节点为 [ ... ]');
+                }
+                renderBlogs(posts);
             } catch (err) {
                 // 显示错误信息
                 errorBox.style.display = 'block';
                 errorBox.innerHTML = `
-                    <strong>⚠️ 博客渲染失败</strong>
+                    <strong>⚠️ 博客加载失败</strong>
                     <p>${err.message}</p>
-                    <pre>${err.stack}</pre>
-                    <p style="margin-top:0.5rem;">请检查浏览器控制台（F12）获取更多信息。</p>
+                    <pre>${err.stack || ''}</pre>
+                    <div class="hint">
+                        💡 请检查：
+                        <ul style="margin:0.5rem 0 0 1.2rem; list-style:disc;">
+                            <li>仓库根目录下是否存在 <strong>posts/index.json</strong> 文件</li>
+                            <li>文件内容是否为合法的 JSON 数组（使用双引号，无尾随逗号）</li>
+                            <li>每个帖子对象至少包含 <strong>title</strong> 和 <strong>file</strong> 字段</li>
+                        </ul>
+                    </div>
                 `;
-                console.error('博客渲染错误:', err);
+                blogList.innerHTML = ''; // 清空卡片区
+                console.error('博客加载错误:', err);
             }
         }
 
         // ================================================================
-        //  7. 帖子阅读模态框
+        //  6. 帖子阅读模态框
         // ================================================================
         const postModal = document.getElementById('postModal');
         const postIframe = document.getElementById('postIframe');
@@ -1126,7 +1129,6 @@
         const progressFill = document.getElementById('progressFill');
         const closePostBtn = document.getElementById('postModalClose');
 
-        // 定义 openPost 函数（供卡片点击调用）
         window.openPost = function(url) {
             postModal.classList.add('active');
             postIframe.classList.remove('loaded');
@@ -1204,21 +1206,21 @@
         });
 
         // ================================================================
-        //  8. 初始化渲染
+        //  7. 初始化
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
-            renderBlogs();
+            loadBlogs();
         });
 
-        // 如果 DOM 已经加载，直接执行
+        // 如果 DOM 已加载，直接执行
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', renderBlogs);
+            document.addEventListener('DOMContentLoaded', loadBlogs);
         } else {
-            renderBlogs();
+            loadBlogs();
         }
 
         // ================================================================
-        //  9. 窗口 resize 重算公告滚动
+        //  8. 窗口 resize 重算公告滚动
         // ================================================================
         let resizeTimer;
         window.addEventListener('resize', () => {
@@ -1234,8 +1236,8 @@
             }, 300);
         });
 
-        console.log('✅ 西卡游戏 重构完成！');
-        console.log('📝 当前帖子数量:', posts.length);
+        console.log('✅ 西卡游戏 启动完成（fetch 版本）');
+        console.log('📡 正在加载 posts/index.json ...');
     </script>
 </body>
 </html>
