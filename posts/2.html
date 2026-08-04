@@ -2,253 +2,64 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>基岩版 · 泥土金币商店 - 西卡游戏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC简易金币商店</title>
     <style>
-        /* 仅修改样式，不改变任何 HTML 结构 */
         body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            line-height: 1.7;
+            color: #1e2f3d;
             background: #ffffff;
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
-            padding: 3rem 2rem;
-            color: #2c241a;
-            line-height: 1.5;
-            margin: 0;
         }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f5f0ec; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #e2cfbe; border-radius: 10px; }
-
-        .post-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(255, 255, 250, 0.6);
-            backdrop-filter: blur(2px);
-            border-radius: 2rem;
-            padding: 35px;
-            border: 0.5px solid rgba(220, 195, 170, 0.4);
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.05);
-        }
-
-        .back-home {
-            display: inline-block;
-            margin-bottom: 25px;
-            color: #b88b66;
-            text-decoration: none;
-            border-bottom: 1.5px dotted #e2cfbe;
-        }
-        .back-home:hover { color: #9a6a48; }
-
-        h1 {
-            color: #b27b58;
-            font-size: 2.2rem;
-            margin-top: 0;
-        }
-        h2 {
-            color: #b27b58;
-            font-size: 1.8rem;
-            margin: 40px 0 20px;
-            border-left: 6px solid #e2cfbe;
-            padding-left: 18px;
-        }
-        h3 {
-            color: #c08a64;
-            font-size: 1.3rem;
-            margin: 30px 0 15px;
-        }
-
-        /* 命令块 + 复制按钮容器 */
-        .cmd-container {
-            position: relative;
-            margin: 15px 0;
-        }
-        .cmd-block {
-            background: #f5f0ea;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-family: 'Courier New', monospace;
-            color: #5a3e2b;
-            border: 0.5px solid #e2cfbe;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-            padding-right: 70px;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            background: #f0e2d6;
-            border: none;
-            border-radius: 2rem;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-            color: #a27252;
-            transition: 0.2s;
-        }
-        .copy-btn:hover { background: #e2cfbe; color: #7b543a; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            background: #fcf8f2;
-            border-radius: 1.2rem;
-            overflow: hidden;
-        }
-        th {
-            background: #efe2d6;
-            color: #a06e4c;
-            font-weight: 600;
-            padding: 12px 10px;
-        }
-        td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #f0e4d8;
-            font-family: 'Courier New', monospace;
-            color: #6b4f38;
-        }
-        tr:last-child td { border-bottom: none; }
-
-        ul, p, .note {
-            color: #5a4a3a;
-        }
-        code {
-            background: #f0e4d8;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.5rem;
-            font-size: 0.85em;
-            color: #ad6d48;
-        }
-        .note {
-            background: #f6ede4;
-            padding: 15px 20px;
-            border-radius: 20px;
-            margin: 25px 0;
-            border-left: 6px solid #e2cfbe;
-        }
-        hr {
-            border: 0.5px solid #f0e2d6;
-            margin: 40px 0;
-        }
-        .date {
-            color: #b28866;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            border-left: 4px solid #e2cfbe;
-            padding-left: 15px;
-        }
-        .image-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin: 40px 0 20px;
-        }
-        .image-row img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 16px;
-            border: 1px solid #e2cfbe;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
-        }
-        .footer-note {
-            text-align: right;
-            color: #bc9a7a;
-            font-size: 0.75rem;
-        }
+        h1 { color: #2c5a7a; border-bottom: 2px solid #d9eaff; padding-bottom: 0.4rem; }
+        .post-meta { color: #7c9ec0; font-size: 0.9rem; margin-bottom: 1.5rem; }
+        img { max-width: 100%; height: auto; }
+        pre { background: #f4f8fc; padding: 1rem; border-radius: 12px; overflow-x: auto; }
+        video { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; background: #000; }
+        table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+        td, th { border: 1px solid #ccc; padding: 6px 10px; }
+        th { background: rgba(0,0,0,0.05); font-weight: bold; }
+        blockquote { border-left: 4px solid #2c5a7a; padding: 12px 20px; margin: 16px 0; background: rgba(124,181,217,0.08); border-radius: 0 8px 8px 0; }
+        a { color: #2c5a7a; }
+        /* WPS heading styles */
+        .wps-big-title { font-size: 26px; font-weight: 700; line-height: 1.3; margin: 12px 0 6px; }
+        .wps-title1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin: 10px 0 5px; }
+        .wps-title2 { font-size: 19px; font-weight: 600; line-height: 1.4; margin: 8px 0 4px; }
+        .wps-title3 { font-size: 17px; font-weight: 600; line-height: 1.45; margin: 6px 0 3px; }
+        .wps-subtitle { font-size: 15px; font-weight: 500; line-height: 1.5; margin: 6px 0 3px; color: #7c9ec0; }
+        .wps-small-title { font-size: 14px; font-weight: 600; line-height: 1.5; margin: 4px 0 2px; color: #7c9ec0; }
+        /* WPS frame styles */
+        .wps-frame-simple { border: 1px solid #ddd; border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+        .wps-frame-shadow { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; margin: 10px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .wps-frame-accent { border-left: 4px solid #1a73e8; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #f0f6ff; }
+        .wps-frame-warn { border-left: 4px solid #f57c00; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #fff8e1; }
+        .wps-frame-success { border-left: 4px solid #388e3c; border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 8px 0; background: #e8f5e9; }
+        .wps-frame-dashed { border: 2px dashed #bbb; border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+        .wps-frame-gradient { border: none; border-radius: 10px; padding: 12px 16px; margin: 10px 0; background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; }
+        .wps-frame-dark { border: none; border-radius: 8px; padding: 10px 14px; margin: 10px 0; background: #1e2f3d; color: #e0e0e0; }
+        /* WPS text effects */
+        .wps-glow { text-shadow: 0 0 8px rgba(26,115,232,0.6); }
+        .wps-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .wps-outline { text-shadow: -1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000; color: #fff; }
+        /* WPS masks */
+        .wps-mask { background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+        .wps-mask-primary { background: rgba(26,115,232,0.1); padding: 4px 8px; border-radius: 4px; }
+        .wps-mask-warn { background: rgba(245,124,0,0.1); padding: 4px 8px; border-radius: 4px; }
+        .wps-mask-success { background: rgba(56,142,60,0.1); padding: 4px 8px; border-radius: 4px; }
+        .wps-mask-dark { background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 4px; }
+        /* WPS badges */
+        .wps-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: #fff; background: #1a73e8; margin: 2px; }
+        .wps-badge-red { background: #e53935; }
+        .wps-badge-green { background: #388e3c; }
+        .wps-badge-orange { background: #f57c00; }
     </style>
 </head>
 <body>
-<div class="post-container">
-    <a href="../index.html" class="back-home">← 返回首页</a>
-    <h1>🧱 基岩版 · 泥土金币商店 · </h1>
-    <div class="date">📅 2026-03-10 | 适用版本：1.20+ 基岩版/网易版</div>
-
-    <p>本教程使用 <strong>泥土</strong> 作为基础货币，通过计分板实现金币系统。包含：创建计分板、消除下线玩家、购买商店（structure加载物品）、显示个人金币。</p>
-
-    <h2>一、金币计分板指令</h2>
-
-    <h3>1. 创建计分板（聊天框执行一次）</h3>
-    <div class="cmd-container">
-        <div class="cmd-block">/scoreboard objectives add 金币 dummy 金币<br>/scoreboard objectives add 备份金币 dummy 金币</div>
-        <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>
-    </div>
-
-    <h3>2. 玩家下线处理(如果你是使用打是侧边显示计分板 那么你需要这个前置 此处不再配备显示计分板教程)</h3>
-    <p>放置四个命令方块，箭头方向一致，参数如下：</p>
-    <table>
-        <thead>
-            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>循环</td><td>无条件</td><td>保持开启</td><td>scoreboard objectives remove 备份金币</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard objectives add 备份金币 dummy 金币</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>/scoreboard objectives setdisplay list 备份金币 descending</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>execute as @a run scoreboard players operation @s 备份金币 = @s 金币</td></tr>
-        </tbody>
-    </table>
-    <p>作用：实时同步在线玩家金币到备份计分板，离线玩家不占用列表显示。</p>
-
-    <h2>二、商品出售指令（金币 → 物品）</h2>
-
-    <h3>准备工作：创建商品结构</h3>
-    <ul style="color:#5a4a3a; margin-left:20px;">
-        <li>放置一个 <code>structure_void</code>（<code>/give @s structure_void</code>）在购买点上方。</li>
-        <li>在 void 正上方丢出要卖的商品（如钻石）。</li>
-        <li>用结构方块保存范围（包含 void 和物品），命名如 <code>shop_dia</code>。</li>
-    </ul>
-
-    <h3>命令方块链（五个方块，箭头一致）</h3>
-    <p>以 100 金币购买 1 钻石为例：</p>
-    <table>
-        <thead>
-            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>title @p title §l§c您的金币不足</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players test @p 金币 * 100</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players remove @p 金币 100</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>title @p title §l§a购买成功</td></tr>
-            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>structure load 自己保存的对应商品的结构名称 &lt;对应坐标&gt;</td></tr>
-        </tbody>
-    </table>
-    <p> </p>
-
-    <h2>三、显示个人金币指令</h2>
-
-    <h3> </h3>
-    <table>
-        <thead>
-            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>tellraw @p {"rawtext":[{"text":"您的金币："},{"score":{"name":"@s","objective":"金币"}}]}</td></tr>
-        </tbody>
-    </table>
-
-    <hr>
-    <p style="text-align: right; color: #bc9a7a;">—— 部分参考图如下 具体指令以实际为准 ——</p>
-
-    <div class="image-row">
-        <img src="https://s41.ax1x.com/2026/03/11/pek81uq.jpg" alt="教程示例图1">
-        <img src="https://s41.ax1x.com/2026/03/11/pek8JET.jpg" alt="教程示例图2">
-    </div>
-</div>
-
-<script>
-    function copyToClipboard(btn) {
-        const container = btn.parentElement;
-        const codeBlock = container.querySelector('.cmd-block');
-        const text = codeBlock.innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            const original = btn.innerText;
-            btn.innerText = '已复制!';
-            setTimeout(() => { btn.innerText = original; }, 1500);
-        }).catch(() => {
-            alert('手动复制吧');
-        });
-    }
-</script>
+    <h1>MC简易金币商店</h1>
+    <div class="post-meta">📅 2026-03-10</div>
+    <div class="post-container">📅 2026-03-10 | 适用版本：1.20+ 基岩版/网易版<p>本教程使用 <strong>泥土</strong> 作为基础货币，通过计分板实现金币系统。包含：创建计分板、消除下线玩家、购买商店（structure加载物品）、显示个人金币。</p>\n\n    <h2>一、金币计分板指令</h2>\n\n    <h3>1. 创建计分板（聊天框执行一次）</h3>\n    <div class="cmd-container">\n        <div class="cmd-block">/scoreboard objectives add 金币 dummy 金币<br>/scoreboard objectives add 备份金币 dummy 金币</div>\n        <button class="copy-btn" onclick="copyToClipboard(this)">复制</button>\n    </div>\n\n    <h3>2. 玩家下线处理(如果你是使用打是侧边显示计分板 那么你需要这个前置 此处不再配备显示计分板教程)</h3>\n    <p>放置四个命令方块，箭头方向一致，参数如下：</p>\n    <table>\n        <thead>\n            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>\n        </thead>\n        <tbody>\n            <tr><td>循环</td><td>无条件</td><td>保持开启</td><td>scoreboard objectives remove 备份金币</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard objectives add 备份金币 dummy 金币</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>/scoreboard objectives setdisplay list 备份金币 descending</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>execute as @a run scoreboard players operation @s 备份金币 = @s 金币</td></tr>\n        </tbody>\n    </table>\n    <p>作用：实时同步在线玩家金币到备份计分板，离线玩家不占用列表显示。</p>\n\n    <h2>二、商品出售指令（金币 → 物品）</h2>\n\n    <h3>准备工作：创建商品结构</h3>\n    <ul style="color:#5a4a3a; margin-left:20px;">\n        <li>放置一个 <code>structure_void</code>（<code>/give @s structure_void</code>）在购买点上方。</li>\n        <li>在 void 正上方丢出要卖的商品（如钻石）。</li>\n        <li>用结构方块保存范围（包含 void 和物品），命名如 <code>shop_dia</code>。</li>\n    </ul>\n\n    <h3>命令方块链（五个方块，箭头一致）</h3>\n    <p>以 100 金币购买 1 钻石为例：</p>\n    <table>\n        <thead>\n            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>\n        </thead>\n        <tbody>\n            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>title @p title §l§c您的金币不足</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players test @p 金币 * 100</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>scoreboard players remove @p 金币 100</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>title @p title §l§a购买成功</td></tr>\n            <tr><td>连锁</td><td>有条件</td><td>保持开启</td><td>structure load 自己保存的对应商品的结构名称 &lt;对应坐标&gt;</td></tr>\n        </tbody>\n    </table>\n    <p> </p>\n\n    <h2>三、显示个人金币指令</h2>\n\n    <h3> </h3>\n    <table>\n        <thead>\n            <tr><th>类型</th><th>条件</th><th>红石</th><th>指令</th></tr>\n        </thead>\n        <tbody>\n            <tr><td>脉冲</td><td>无条件</td><td>红石控制</td><td>tellraw @p {"rawtext":[{"text":"您的金币："},{"score":{"name":"@s","objective":"金币"}}]}</td></tr>\n        </tbody>\n    </table>\n\n    <hr>\n    <p style="text-align: right; color: #bc9a7a;">—— 部分参考图如下 具体指令以实际为准 ——</p>\n\n    <div class="image-row">\n        <img src="https://s41.ax1x.com/2026/03/11/pek81uq.jpg" alt="教程示例图1">\n        <img src="https://s41.ax1x.com/2026/03/11/pek8JET.jpg" alt="教程示例图2">\n    </div>\n</div>\n\n<script>\n    function copyToClipboard(btn) {\n        const container = btn.parentElement;\n        const codeBlock = container.querySelector('.cmd-block');\n        const text = codeBlock.innerText;\n        navigator.clipboard.writeText(text).then(() => {\n            const original = btn.innerText;\n            btn.innerText = '已复制!';\n            setTimeout(() => { btn.innerText = original; }, 1500);\n        }).catch(() => {\n            alert('手动复制吧');\n        });\n    }\n</script>
 </body>
 </html>
