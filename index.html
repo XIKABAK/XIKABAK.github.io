@@ -1163,7 +1163,7 @@
                     postIframe.classList.add('loaded');
                 }, 300);
 
-                // 劫持返回链接（只劫持明确的返回链接，不再误伤包含 "blog" 的链接）
+                // 只劫持明确指向首页的链接，其他任何链接（包括本域其他页面）都不干预
                 try {
                     const doc = postIframe.contentDocument || postIframe.contentWindow.document;
                     if (doc) {
@@ -1171,8 +1171,8 @@
                             const href = link.getAttribute('href');
                             if (!href) return;
 
-                            // 只劫持明确的返回链接
-                            const isReturn = (
+                            // 判断是否为返回首页的链接（精确匹配）
+                            const isHome = (
                                 href === 'index.html' ||
                                 href === '/' ||
                                 href === './' ||
@@ -1181,18 +1181,14 @@
                                 href.endsWith('index.html')
                             );
 
-                            if (isReturn) {
+                            if (isHome) {
+                                // 劫持返回链接：关闭模态框
                                 link.addEventListener('click', function(e) {
                                     e.preventDefault();
                                     closePostModal(true);
                                 });
-                            } else {
-                                // 对于外部链接，在新窗口打开（避免在 iframe 内跳转）
-                                if (href.startsWith('http://') || href.startsWith('https://')) {
-                                    link.setAttribute('target', '_blank');
-                                }
-                                // 内部链接保留在 iframe 内（正常导航）
                             }
+                            // 其他链接不做任何改动（既不阻止默认行为，也不添加 target）
                         });
                     }
                 } catch (_) { /* 跨域忽略 */ }
