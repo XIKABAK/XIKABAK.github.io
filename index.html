@@ -24,7 +24,7 @@
             color: inherit;
         }
 
-        /* ===== 背景（固定视口，不随滚动变化） ===== */
+        /* ===== 背景（固定视口） ===== */
         .bg-layer {
             position: fixed;
             top: 0;
@@ -172,7 +172,7 @@
             border-radius: 36px;
             padding: 1.8rem 2rem;
             border: 0.5px solid rgba(210, 225, 235, 0.6);
-            min-height: 80vh; /* 确保背景至少覆盖大部分屏幕 */
+            min-height: 80vh;
         }
 
         /* ===== 页面切换 ===== */
@@ -207,7 +207,7 @@
         .home-wrapper {
             display: flex;
             flex-direction: column;
-            min-height: 60vh; /* 手机端足够撑满 */
+            min-height: 60vh;
             justify-content: space-between;
         }
         .notice-bar {
@@ -682,7 +682,7 @@
             .main {
                 padding: 1.2rem 1rem;
                 border-radius: 28px;
-                min-height: 70vh; /* 手机端稍小一点 */
+                min-height: 70vh;
             }
             .home-wrapper {
                 min-height: 50vh;
@@ -844,7 +844,7 @@
                             <p><strong>三、内容合法性承诺</strong><br />站主郑重承诺：本网站所有内容（包括但不限于文字、图片、视频、链接等）均符合国家法律、行政法规及社会主义核心价值观。站主将定期对网站内容进行自查自纠，确保内容健康、合法、积极向上。</p>
                             <p><strong>四、知识产权与侵权处理</strong><br />本网站尊重他人知识产权，坚决反对任何形式的侵权行为。如您认为本网站上的任何内容侵犯了您的合法权益（包括著作权、商标权、肖像权等），请及时与站主取得联系。我们将在收到正式通知后第一时间对相关内容进行核实，并视情况采取下架、删除、断开链接等必要措施。对于已下架内容，站主将保留处理记录以备查证。</p>
                             <p><strong>五、投稿免责声明</strong><br />用户向本网站投稿的内容（包括但不限于文章、图片、音频、视频、代码等），其著作权及法律责任均由投稿人本人承担。站主不对投稿内容的合法性、真实性、准确性、完整性作任何形式的担保或承诺。若投稿内容涉及侵权、诽谤、虚假宣传或其他法律纠纷，由投稿人自行处理并承担全部法律责任，站主不承担任何连带责任。站主保留对投稿内容进行审核、修改或删除的权利。</p>
-                            <p><strong>六、联系方式</strong><br />如您对本网站有任何疑问、建议或投诉，或发现任何侵权内容，请通过以下方式联系站主：<br />邮箱：<span style="color:#2c5a7a;font-weight:500;">[xikabak@outlook.com]</span><br />（我们将在收到信息后 3 个工作日内予以回复。）</p>
+                            <p><strong>六、联系方式</strong><br />如您对本网站有任何疑问、建议或投诉，或发现任何侵权内容，请通过以下方式联系站主：<br />邮箱：<span style="color:#2c5a7a;font-weight:500;">[请站主补充邮箱地址]</span><br />（我们将在收到信息后 3 个工作日内予以回复。）</p>
                             <div class="sig">西卡游戏 · 站主<br /><span style="font-size:0.8rem;color:#8aaec8;">本申明自发布之日起生效，最终解释权归站主所有。</span></div>
                         </div>
                     </div>
@@ -1131,7 +1131,7 @@
         }
 
         // ================================================================
-        //  6. 帖子阅读模态框
+        //  6. 帖子阅读模态框（修正链接劫持逻辑）
         // ================================================================
         const postModal = document.getElementById('postModal');
         const postIframe = document.getElementById('postIframe');
@@ -1162,21 +1162,36 @@
                     postLoader.style.display = 'none';
                     postIframe.classList.add('loaded');
                 }, 300);
-                // 劫持返回链接
+
+                // 劫持返回链接（只劫持明确的返回链接，不再误伤包含 "blog" 的链接）
                 try {
                     const doc = postIframe.contentDocument || postIframe.contentWindow.document;
                     if (doc) {
                         doc.querySelectorAll('a').forEach(link => {
                             const href = link.getAttribute('href');
                             if (!href) return;
-                            if (href === 'index.html' || href === '/' || href === './' || href === '#' || href === '' ||
-                                href.endsWith('index.html') || href.includes('blog')) {
+
+                            // 只劫持明确的返回链接
+                            const isReturn = (
+                                href === 'index.html' ||
+                                href === '/' ||
+                                href === './' ||
+                                href === '#' ||
+                                href === '' ||
+                                href.endsWith('index.html')
+                            );
+
+                            if (isReturn) {
                                 link.addEventListener('click', function(e) {
                                     e.preventDefault();
                                     closePostModal(true);
                                 });
                             } else {
-                                link.setAttribute('target', '_blank');
+                                // 对于外部链接，在新窗口打开（避免在 iframe 内跳转）
+                                if (href.startsWith('http://') || href.startsWith('https://')) {
+                                    link.setAttribute('target', '_blank');
+                                }
+                                // 内部链接保留在 iframe 内（正常导航）
                             }
                         });
                     }
@@ -1222,7 +1237,6 @@
             loadBlogs();
         });
 
-        // 如果 DOM 已加载，直接执行
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', loadBlogs);
         } else {
